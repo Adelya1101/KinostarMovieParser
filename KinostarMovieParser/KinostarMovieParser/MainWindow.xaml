@@ -1,0 +1,182 @@
+﻿<Window x:Class="KinostarMovieParser.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:KinostarMovieParser"
+        mc:Ignorable="d"
+        Title="KINOSTAR" Height="800" Width="800">
+
+    <Window.Resources>
+        <Style x:Key="LoaderStyle" TargetType="{x:Type Image}">
+            <Setter Property="Source" Value="Images/waiting.png"/>
+            <Setter Property="Width" Value="25"/>
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Stretch" Value="Fill"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5, 0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <RotateTransform x:Name="renderTransform" />
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard>
+                        <Storyboard RepeatBehavior="Forever">
+                            <DoubleAnimation
+                            Storyboard.TargetProperty="(Image.RenderTransform).(RotateTransform.Angle)"
+                            To="360" Duration="0:0:3" RepeatBehavior="Forever" >
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ImageButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Background="Transparent">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="MovieTitleStyle">
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Foreground" Value="#FFD400"/>
+            <Setter Property="FontSize" Value="28"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="TextBlock.TextDecorations" Value="Underline" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+       
+        <Style TargetType="TextBlock" x:Key="BaseTextStyle">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="DarkGray" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="BaseYellowTextStyle" BasedOn="{StaticResource BaseTextStyle}">
+            <Setter Property="Foreground" Value="#FFD400"/>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="BaseWhiteTextStyle" BasedOn="{StaticResource BaseTextStyle}">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox Height="30" Width="Auto" Margin="10,0" VerticalContentAlignment="Center" x:Name="SearchText"/>
+
+            <Button Grid.Column="1" Margin="0,0,10,0" Height="30" x:Name="SearchButton" Click="SearchButton_Click">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                    <ContentControl Margin="4" Content="Поиск"/>
+                    <Image Source="Images/search.png" Margin="5"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <TextBlock Text="Нет загруженных фильмов...&#10;Нажмите 'Загрузить' для загрузки фильмов" Grid.Row="1" FontSize="32"
+                   VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"
+                   x:Name="NoContentText"/>
+
+        <ItemsControl x:Name="moviesItemsControl" Grid.Row="1" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ItemsControl.Template>
+                <ControlTemplate>
+                    <ScrollViewer x:Name="ScrollViewer" Padding="{TemplateBinding Padding}">
+                        <ItemsPresenter />
+                    </ScrollViewer>
+                </ControlTemplate>
+            </ItemsControl.Template>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border CornerRadius="5" Margin="10,5">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#4F2554" Offset="0.0" />
+                                <GradientStop Color="#351D61" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.2*"/>
+                                <ColumnDefinition Width="0.8*"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Image Source="{Binding PosterURL}"/>
+
+                            <Grid Grid.Column="1" Margin="10,0,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="40"/>
+                                    <RowDefinition Height="60"/>
+                                    <RowDefinition Height="100"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="{Binding Name}" Style="{StaticResource MovieTitleStyle}" PreviewMouseDown="MovieNameText_PreviewMouseDown" Tag="{Binding}"/>
+
+                                <ItemsControl Grid.Row="1" ItemsSource="{Binding Sessions}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                                                <TextBlock IsEnabled="{Binding IsAvailable}" Text="{Binding StartTime, StringFormat={}{0:hh\\:mm}}" FontSize="28" Style="{StaticResource BaseYellowTextStyle}"/>
+                                                <TextBlock IsEnabled="{Binding IsAvailable}" Text="{Binding Price, StringFormat={}{0}₽}" VerticalAlignment="Top" Margin="3,5,0,0" FontSize="12" Style="{StaticResource BaseWhiteTextStyle}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <TextBlock Grid.Row="2" Text="{Binding ShortDescription}" Foreground="White" FontSize="18"
+                                           TextWrapping="Wrap" Margin="0,0,20,0"/>
+                            </Grid>
+
+                            <Button ToolTip="Редактировать" Grid.Column="2" Style="{StaticResource ImageButtonStyle}" Cursor="Hand"
+                                    VerticalAlignment="Top" Margin="5" x:Name="EditMovieButton" Click="EditMovieButton_Click"
+                                    Tag="{Binding}">
+                                <Image Source="Images/pencil.png" Stretch="Uniform"/>
+                            </Button>
+
+                            <Button ToolTip="Удалить" Grid.Column="2" Style="{StaticResource ImageButtonStyle}" Cursor="Hand"
+                                    VerticalAlignment="Bottom" Margin="5" x:Name="DeleteMovieButton" Click="DeleteMovieButton_Click"
+                                    Tag="{Binding}">
+                                <Image Source="Images/trash-bin.png" Stretch="Uniform"/>
+                            </Button>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Button x:Name="RefreshButton" Content="Загрузить" Grid.Row="2" Margin="5" Click="LoadMoviesButton_Click"/>
+        <Image x:Name="LoadingImg" Style="{StaticResource LoaderStyle}" Grid.Row="2" HorizontalAlignment="Right" Margin="0,0,10,0" Visibility="Collapsed"
+               ToolTip="Пожалуйста, подождите, идёт загрузка..."/>
+    </Grid>
+</Window>

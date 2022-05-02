@@ -1,0 +1,135 @@
+﻿<Window x:Class="KinostarMovieParser.EditMovieWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:KinostarMovieParser"
+        mc:Ignorable="d"
+        Title="EditMovieWindow" Height="650" Width="800">
+
+    <Window.Resources>
+        <Style TargetType="{x:Type TextBox}" x:Key="BaseTextBox">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="White"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        
+        <Style TargetType="{x:Type TextBlock}" x:Key="GrayTextStyle">
+            <Setter Property="Foreground" Value="LightGray"/>
+            <Setter Property="FontWeight" Value="DemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
+        <Style TargetType="{x:Type TextBox}" x:Key="InfoTextStyle" BasedOn="{StaticResource BaseTextBox}">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="0,2,10,2"/>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="BaseTextStyle">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="DarkGray" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="BaseYellowTextStyle" BasedOn="{StaticResource BaseTextStyle}">
+            <Setter Property="Foreground" Value="#FFD400"/>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="BaseWhiteTextStyle" BasedOn="{StaticResource BaseTextStyle}">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#316A7C" Offset="0.0" />
+                <GradientStop Color="#4E3942" Offset="0.5" />
+                <GradientStop Color="#3A2E37" Offset="1.0" />
+            </LinearGradientBrush>
+        </Grid.Background>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.3*"/>
+                <ColumnDefinition Width="0.8*"/>
+            </Grid.ColumnDefinitions>
+
+            <Image x:Name="PosterImage" Source="{Binding PosterURL}" VerticalAlignment="Top" Margin="10,10,0,0" />
+
+            <Grid Grid.Column="1" Margin="10,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="80"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBox x:Name="MovieNameText" Foreground="#FFD400" FontSize="28" Margin="0,0,10,0" Height="45" Style="{StaticResource BaseTextBox}"/>
+
+                <StackPanel Orientation="Vertical" Grid.Row="1" VerticalAlignment="Top" Margin="0,10,0,0">
+                    <TextBlock Foreground="#FFD400" Text="Сеансы" FontSize="14" FontWeight="DemiBold"/>
+
+                    <ItemsControl x:Name="SessionsItemsControl" Grid.Row="1" ItemsSource="{Binding Sessions}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,20,0">
+                                    <TextBlock Text="{Binding StartTime, StringFormat={}{0:hh\\:mm}}" Style="{StaticResource BaseYellowTextStyle}" FontSize="28"/>
+                                    <TextBlock Text="{Binding Price, StringFormat={}{0}₽}" Style="{StaticResource BaseWhiteTextStyle}" VerticalAlignment="Top" Margin="3,5,0,0" FontSize="12"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="В прокате с" Style="{StaticResource GrayTextStyle}"/>
+                    <TextBlock Grid.Row="1" Text="В прокате до" Style="{StaticResource GrayTextStyle}"/>
+                    <TextBlock Grid.Row="2" Text="Хронометраж" Style="{StaticResource GrayTextStyle}"/>
+                    <TextBlock Grid.Row="3" Text="Режиссёр" Style="{StaticResource GrayTextStyle}"/>
+                    <TextBlock Grid.Row="4" Text="В ролях" Style="{StaticResource GrayTextStyle}"/>
+
+                    <TextBox x:Name="StartDateText" Grid.Row="0" Grid.Column="1" Style="{StaticResource InfoTextStyle}"/>
+                    <TextBox x:Name="EndDateText" Grid.Row="1" Grid.Column="1" Style="{StaticResource InfoTextStyle}" />
+                    <TextBox x:Name="TimingText" Grid.Row="2" Grid.Column="1" Style="{StaticResource InfoTextStyle}" />
+                    <TextBox x:Name="DirectorText" Grid.Row="3" Grid.Column="1" Style="{StaticResource InfoTextStyle}"/>
+                    <TextBox x:Name="ActorsText" Grid.Row="4" Grid.Column="1" Style="{StaticResource InfoTextStyle}" TextWrapping="Wrap" Height="Auto"/>
+
+                </Grid>
+
+                <TextBox Grid.Row="3" Foreground="White" FontSize="18" TextWrapping="Wrap" Margin="0,10,10,0" x:Name="DecriptionText" VerticalAlignment="Top"
+                         AcceptsReturn="True" Style="{StaticResource BaseTextBox}" Height="Auto"/>
+            </Grid>
+
+            <Button Content="Отмена" Grid.Row="1" Height="35" Width="150" Margin="10,0,0,0" HorizontalAlignment="Left" Background="#80CCCCCC" Foreground="White"
+                    Click="CancelButton_Click"/>
+            <Button Content="Сохранить изменения" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Width="150" Height="35" Margin="0,0,10,0" Background="#80CCCCCC"
+                    Click="SaveButton_Click" Foreground="White"/>
+        </Grid>
+    </Grid>
+</Window>
